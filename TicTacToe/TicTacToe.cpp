@@ -75,8 +75,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hInstance      = hInstance;
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_TICTACTOE));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)GetStockObject(DKGRAY_BRUSH);
     //wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);	->Default Background Color
-	wcex.hbrBackground = (HBRUSH)GetStockObject(GRAY_BRUSH);
     wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_TICTACTOE);
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -186,11 +186,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			RECT rc;
 
 			if (GetGameBoardRect(hWnd, &rc)) {
-				//FillRect(hdc, &rc, (HBRUSH)GetStockObject(WHITE_BRUSH));
-				Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+				FillRect(hdc, &rc, (HBRUSH)GetStockObject(LTGRAY_BRUSH));
+				//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 			}
 
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 4; i++) {
 				//Draw Vertical Lines
 				DrawLine(hdc, rc.left + CELL_SIZE * i, rc.top, rc.left + CELL_SIZE * i, rc.bottom);
 				//Draw Horizontal Lines
