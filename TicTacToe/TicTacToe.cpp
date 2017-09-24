@@ -124,6 +124,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //Box Size
 const int CELL_SIZE = 100;
 
+//Game Board
 BOOL GetGameBoardRect(HWND hwnd, RECT *pRect)
 {
 	RECT rc;
@@ -143,6 +144,7 @@ BOOL GetGameBoardRect(HWND hwnd, RECT *pRect)
 	return FALSE;
 }
 
+//Seperate Draw Line
 void DrawLine(HDC hdc, int x1, int y1, int x2, int y2)
 {
 	MoveToEx(hdc, x1, y1, NULL);
@@ -182,7 +184,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
-            // Draw the main chees board
+            //Game Main Start
 			RECT rc;
 
 			if (GetGameBoardRect(hWnd, &rc)) {
