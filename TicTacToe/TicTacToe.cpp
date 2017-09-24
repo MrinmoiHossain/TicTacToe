@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "TicTacToe.h"
+#include <windowsx.h>
 
 #define MAX_LOADSTRING 100
 
@@ -151,6 +152,54 @@ void DrawLine(HDC hdc, int x1, int y1, int x2, int y2)
 	LineTo(hdc, x2, y2);
 }
 
+//Postion of Mouse Click
+int GetCellNumberFromPoint(HWND hwnd, int x, int y)
+{
+	RECT rc;
+	POINT pt = { x, y};
+
+	if (GetGameBoardRect(hwnd, &rc)) {
+		if (PtInRect(&rc, pt)) {
+			//user clicked inside game board
+			x = pt.x - rc.left;
+			y = pt.y - rc.top;
+
+			int column = x / CELL_SIZE;
+			int row = y / CELL_SIZE;
+
+			//conver to index: 0 to 8
+			return column + row * 3;
+		}
+	}
+
+	return -1;	//clicked outside game board or failure
+}
+
+BOOL GetCellRect(HWND hWnd, int index, RECT *pRect)
+{
+	RECT rcBoard;
+
+	SetRectEmpty(pRect);
+	if (index < 0 || index > 8) {
+		return FALSE;
+	}
+
+	if (GetGameBoardRect(hWnd, &rcBoard)) {
+		//conver index for 0 to 8 into (x, y) pair
+		int r = index / 3;	//row number
+		int c = index % 3;	//column number
+
+		pRect->left = rcBoard.left + c * CELL_SIZE;
+		pRect->top = rcBoard.top + r * CELL_SIZE;
+		pRect->right = pRect->left + CELL_SIZE;
+		pRect->bottom = pRect->top + CELL_SIZE;
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
@@ -172,6 +221,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+
+	case WM_LBUTTONDOWN:
+		{
+			int xPos = GET_X_LPARAM(lParam);
+			int yPos = GET_Y_LPARAM(lParam);
+
+			int index = GetCellNumberFromPoint(hWnd, xPos, yPos);
+
+			HDC hdc = GetDC(hWnd);
+
+			if (NULL != hdc) {
+				//WCHAR temp[100];
+
+				//wsprintf(temp, L"Index = %d", index);
+				//TextOut(hdc, xPos, yPos, temp, lstrlen(temp));
+
+				//Get cell dimension from its index
+				if (index != -1) {
+					RECT rcCell;
+					if (GetCellRect(hWnd, index, &rcCell)) {
+						FillRect(hdc, &rcCell, (HBRUSH)GetStockObject(BLACK_BRUSH));
+					}
+				}
+				ReleaseDC(hWnd, hdc);
+			}
+		}
+		break;
 	case WM_GETMINMAXINFO:
 		{
 			MINMAXINFO *pMinMax = (MINMAXINFO *)lParam;
