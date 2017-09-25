@@ -287,6 +287,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				//Draw Horizontal Lines
 				DrawLine(hdc, rc.left, rc.top + CELL_SIZE * i, rc.right, rc.top + CELL_SIZE * i);
 			}
+
+			RECT rcCell;
+			for (int i = 0; i < 9; i++) {
+				if ((gameBoard[i] != 0) &&GetCellRect(hWnd, i, &rcCell)) {
+					FillRect(hdc, &rcCell, (gameBoard[i] == 1) ? color1 : color2);
+				}
+			}
 			
             EndPaint(hWnd, &ps);
         }
