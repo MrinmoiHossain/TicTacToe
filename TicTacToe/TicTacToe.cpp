@@ -122,8 +122,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_PAINT    - Paint the main window
 //  WM_DESTROY  - post a quit message and return
 //
-//Box Size
+
+//Board Size
 const int CELL_SIZE = 100;
+//Board Color
+HBRUSH color1, color2;
+//Player Variable
+int playerTurn = 1;
+int gameBoard[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 //Game Board
 BOOL GetGameBoardRect(HWND hwnd, RECT *pRect)
@@ -204,6 +210,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+	case WM_CREATE:
+		{
+			color1 = CreateSolidBrush(RGB(0, 25, 51));
+			color2 = CreateSolidBrush(RGB(0, 51, 51));
+		}
+		break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -221,7 +233,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
-
 	case WM_LBUTTONDOWN:
 		{
 			int xPos = GET_X_LPARAM(lParam);
@@ -240,8 +251,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				//Get cell dimension from its index
 				if (index != -1) {
 					RECT rcCell;
-					if (GetCellRect(hWnd, index, &rcCell)) {
-						FillRect(hdc, &rcCell, (HBRUSH)GetStockObject(BLACK_BRUSH));
+					if ((gameBoard[index] == 0) && GetCellRect(hWnd, index, &rcCell)) {
+						gameBoard[index] = playerTurn;
+						FillRect(hdc, &rcCell, (playerTurn == 1) ? color1 : color2);
+						playerTurn = (playerTurn == 1) ? 2 : 1;
 					}
 				}
 				ReleaseDC(hWnd, hdc);
@@ -268,7 +281,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				//Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
 			}
 
-			for (int i = 0; i < 4; i++) {
+			for (int i = 1; i < 3; i++) {
 				//Draw Vertical Lines
 				DrawLine(hdc, rc.left + CELL_SIZE * i, rc.top, rc.left + CELL_SIZE * i, rc.bottom);
 				//Draw Horizontal Lines
@@ -279,6 +292,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_DESTROY:
+		DeleteObject(color1);
+		DeleteObject(color2);
         PostQuitMessage(0);
         break;
     default:
